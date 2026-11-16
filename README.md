@@ -18,6 +18,8 @@ pip install databucket-client
 The same features and version numbers as the [Java client](https://github.com/databucket/databucket-java-client) and
 the [JavaScript client](https://github.com/databucket/databucket-js-client).
 
+Runnable examples - pytest tests that reserve, change, create and find data on the DEMO dataset: [databucket-examples/python](https://github.com/databucket/databucket-examples/tree/main/python).
+
 ## Quick start
 
 ```python
