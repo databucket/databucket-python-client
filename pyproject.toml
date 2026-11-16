@@ -1,0 +1,58 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "databucket-client"
+version = "2.0.0"
+description = "Client for Databucket (test data management): find, reserve, change and remove test data from your automated tests"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Krzysztof Słysz" }]
+requires-python = ">=3.10"
+dependencies = ["requests>=2.32"]
+keywords = ["databucket", "test data", "test data management", "pytest", "testing"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Testing",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/databucket/databucket-python-client"
+Issues = "https://github.com/databucket/databucket-python-client/issues"
+Databucket = "https://github.com/databucket/databucket-server"
+
+[dependency-groups]
+dev = [
+    "pytest==9.2.0",
+    "responses==0.26.3",
+    "ruff==0.17.4",
+    "mypy==2.4.1",
+    "types-requests==2.33.0.20261030",
+    "build==1.6.1",
+    "twine==7.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/databucket"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src"]
