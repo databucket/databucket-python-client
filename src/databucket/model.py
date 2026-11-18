@@ -42,7 +42,8 @@ class Reservation(Generic[T]):
 
     #: The reserved rows (fewer than the limit when not enough free rows match).
     rows: list[DataRow[T]]
-    #: Number of free rows matching the rules left after this reservation.
+    #: Number of free rows matching the rules left after this reservation; -1 when not counted
+    #: (:meth:`Reserve.without_count`).
     available: int
 
 
