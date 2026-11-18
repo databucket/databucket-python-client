@@ -261,6 +261,20 @@ def test_reserve_and_release(items: Bucket[dict[str, Any]]) -> None:
     assert items.reserve(free).available() == 1
 
 
+def test_reserve_without_count(items: Bucket[dict[str, Any]]) -> None:
+    group = unique("reserve-no-count")
+    for i in range(3):
+        items.insert(item(group, "free", i))
+    free = named(group)
+
+    two = items.reserve(free).limit(2).without_count().fetch()
+    assert len(two.rows) == 2
+    assert two.available == -1
+
+    assert items.reserve(free).one() is not None
+    assert items.reserve(free).available() == 0
+
+
 def test_parallel_reservations_never_share_a_row(items: Bucket[dict[str, Any]]) -> None:
     group = unique("parallel")
     items.insert_all(item(group, "free", i) for i in range(20))

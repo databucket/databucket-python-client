@@ -74,7 +74,12 @@ class Reserve(Generic[T]):
 
         user = users.reserve(rules).one()
         r = users.reserve(rules).limit(3).sort(Sort.RANDOM).fetch()
+        quick = users.reserve(rules).limit(3).without_count().fetch()
         free = users.reserve(rules).available()
+
+    Counting the free rows that still match (:attr:`Reservation.available`) reads all of them: with many matching
+    rows it is most of the time of a reservation. :meth:`one` never counts, :meth:`without_count` skips it for
+    :meth:`fetch` (Databucket 3.16.3+; older servers always count).
     """
 
     def __init__(self, bucket: Bucket[T], rules: Rules) -> None:
@@ -83,6 +88,7 @@ class Reserve(Generic[T]):
         self._limit = 1
         self._sort = "id"
         self._for_user: str | None = None
+        self._count = True
 
     def limit(self, limit: int) -> Reserve[T]:
         """Number of rows to reserve (default 1)."""
@@ -101,17 +107,23 @@ class Reserve(Generic[T]):
         self._for_user = username
         return self
 
+    def without_count(self) -> Reserve[T]:
+        """Reserve without counting the free rows still matching (:attr:`Reservation.available` is then -1): faster
+        when many rows match."""
+        self._count = False
+        return self
+
     def fetch(self) -> Reservation[T]:
-        return self._bucket._reserve_rows(self._rules, self._limit, self._sort, self._for_user)
+        return self._bucket._reserve_rows(self._rules, self._limit, self._sort, self._for_user, self._count)
 
     def one(self) -> DataRow[T] | None:
-        """Reserves one row; None when no free row matches."""
-        rows = self._bucket._reserve_rows(self._rules, 1, self._sort, self._for_user).rows
+        """Reserves one row; None when no free row matches. Doesn't count the free rows (not needed here)."""
+        rows = self._bucket._reserve_rows(self._rules, 1, self._sort, self._for_user, False).rows
         return rows[0] if rows else None
 
     def available(self) -> int:
         """Number of free rows matching the rules; nothing is reserved."""
-        return self._bucket._reserve_rows(self._rules, 0, self._sort, self._for_user).available
+        return self._bucket._reserve_rows(self._rules, 0, self._sort, self._for_user, True).available
 
 
 class HistorySearch(Generic[T]):

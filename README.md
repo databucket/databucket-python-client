@@ -125,7 +125,7 @@ Dates can be given as `datetime`; they are sent as ISO text in UTC (a `datetime`
 | `insert_all([p1, p2, NewData(p3).tag_id(3)])` | `POST /api/bucket/{bucket}/multi` |
 | `get(id)` (`None` when missing), `get([id1, id2])` | `GET /api/bucket/{bucket}/{ids}` |
 | `find(rules).sort(Sort.desc("$.name")).limit(20).page(2).fetch()` / `.list()` / `.first()` / `.count()`, `count(rules)` | `POST /api/bucket/{bucket}/get` |
-| `reserve(rules).one()`, `.limit(3).sort(Sort.RANDOM).fetch()`, `.available()`, `.for_user("john")` (ADMIN) | `POST /api/bucket/{bucket}/reserve` |
+| `reserve(rules).one()`, `.limit(3).sort(Sort.RANDOM).fetch()`, `.without_count()`, `.available()`, `.for_user("john")` (ADMIN) | `POST /api/bucket/{bucket}/reserve` |
 | `update(change, *ids)`, `update(rules, change)`, `release(*ids)` | `PUT /api/bucket/{bucket}[/{ids}]` |
 | `delete(*ids)`, `delete(rules)` | `DELETE /api/bucket/{bucket}[/{ids}]` |
 | `history(id)`, `history_properties(id, *history_ids)`, `clear_history(id)`, `clear_history(rules)` | `/api/bucket/{bucket}/{id}/history...` |

@@ -93,15 +93,14 @@ class Bucket(Generic[T]):
         """A reservation of free rows matching the rules; see :class:`Reserve`."""
         return Reserve(self, rules)
 
-    def _reserve_rows(self, rules: Rules, limit: int, sort: str, for_user: str | None) -> Reservation[T]:
+    def _reserve_rows(self, rules: Rules, limit: int, sort: str, for_user: str | None, count: bool) -> Reservation[T]:
         body = dict(rules.to_body())
         if for_user is not None:
             body["targetOwnerUsername"] = for_user
-        result = (
-            self._databucket._call("POST", f"{self._path}/reserve?limit={limit}&sort={quote(sort, safe='')}", body)
-            or {}
-        )
-        return Reservation(rows=self._rows(result.get("data")), available=int(result.get("available", 0)))
+        query = f"limit={limit}&sort={quote(sort, safe='')}" + ("" if count else "&count=false")
+        result = self._databucket._call("POST", f"{self._path}/reserve?{query}", body) or {}
+        # not counted (count=false): no 'available' in the response
+        return Reservation(rows=self._rows(result.get("data")), available=int(result.get("available", -1)))
 
     def release(self, *ids: int) -> int:
         """Releases the rows (reserved = False); returns the number of changed rows."""
