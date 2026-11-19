@@ -21,6 +21,11 @@ class Query(Generic[T]):
         rows = users.find(rules).limit(100).list()
         row = users.find(rules).first()
         count = users.find(rules).count()
+        next_page = users.find(rules).limit(20).page(3).without_count().fetch()
+
+    Counting all the matching rows (:attr:`Page.total`) reads every one of them: with many matching rows it is most
+    of the time of a page. :meth:`list` and :meth:`first` never count, :meth:`without_count` skips it for
+    :meth:`fetch` (Databucket 3.18.1+; older servers always count).
     """
 
     def __init__(self, bucket: Bucket[T], rules: Rules) -> None:
@@ -29,6 +34,7 @@ class Query(Generic[T]):
         self._page = 1
         self._limit = 1
         self._sort = "id"
+        self._count = True
 
     def page(self, page: int) -> Query[T]:
         """Page number, starting from 1 (default 1)."""
@@ -49,16 +55,22 @@ class Query(Generic[T]):
         self._sort = sort
         return self
 
+    def without_count(self) -> Query[T]:
+        """Fetch the page without counting all the matching rows (:attr:`Page.total` and :attr:`Page.total_pages`
+        are then -1): faster when many rows match, e.g. for the next pages of the same rules."""
+        self._count = False
+        return self
+
     def fetch(self) -> Page[T]:
-        return self._bucket._fetch_page(self._rules, self._page, self._limit, self._sort)
+        return self._bucket._fetch_page(self._rules, self._page, self._limit, self._sort, self._count)
 
     def list(self) -> list[DataRow[T]]:
-        """The rows of the page."""
-        return self.fetch().rows
+        """The rows of the page. Doesn't count the matching rows (not needed here)."""
+        return self._bucket._fetch_page(self._rules, self._page, self._limit, self._sort, False).rows
 
     def first(self) -> DataRow[T] | None:
-        """The first matching row; None when none matches."""
-        rows = self._bucket._fetch_page(self._rules, 1, 1, self._sort).rows
+        """The first matching row; None when none matches. Doesn't count the matching rows."""
+        rows = self._bucket._fetch_page(self._rules, 1, 1, self._sort, False).rows
         return rows[0] if rows else None
 
     def count(self) -> int:

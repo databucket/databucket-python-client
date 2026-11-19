@@ -31,8 +31,9 @@ class Page(Generic[T]):
     #: Page number, starting from 1.
     page: int
     limit: int
-    #: Number of all matching rows.
+    #: Number of all matching rows; -1 when not counted (:meth:`Query.without_count`).
     total: int
+    #: Number of pages; -1 when not counted.
     total_pages: int
 
 
