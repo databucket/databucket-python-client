@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "databucket-client"
-version = "2.1.0"
+version = "2.2.0"
 description = "Client for Databucket (test data management): find, reserve, change and remove test data from your automated tests"
 readme = "README.md"
 license = "MIT"

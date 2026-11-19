@@ -176,6 +176,22 @@ def test_insert_all_and_paging(items: Bucket[dict[str, Any]]) -> None:
     assert items.find(rules).limit(3).page(9).list() == []
 
 
+def test_page_without_count(items: Bucket[dict[str, Any]]) -> None:
+    batch = unique("no-count")
+    items.insert_all(item(batch, "paged", i + 1) for i in range(5))
+    rules = named(batch)
+
+    page2 = items.find(rules).sort(Sort.desc("$.count")).limit(2).page(2).without_count().fetch()
+    assert [r.properties["count"] for r in page2.rows] == [3, 2]
+    assert page2.total == -1
+    assert page2.total_pages == -1
+
+    assert len(items.find(rules).limit(10).list()) == 5
+    first = items.find(rules).sort(Sort.desc("$.count")).first()
+    assert first is not None and first.properties["count"] == 5
+    assert items.find(rules).limit(2).fetch().total == 5
+
+
 # ---------------------------------------------------------------------- rules (API v2)
 
 

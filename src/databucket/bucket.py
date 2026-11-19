@@ -72,19 +72,19 @@ class Bucket(Generic[T]):
         result = self._databucket._call("POST", f"{self._path}/get?limit=0", rules.to_body())
         return int((result or {}).get("total", 0))
 
-    def _fetch_page(self, rules: Rules, page: int, limit: int, sort: str) -> Page[T]:
-        result = (
-            self._databucket._call(
-                "POST", f"{self._path}/get?page={page}&limit={limit}&sort={quote(sort, safe='')}", rules.to_body()
-            )
-            or {}
-        )
+    def _fetch_page(self, rules: Rules, page: int, limit: int, sort: str, count: bool = True) -> Page[T]:
+        path = f"{self._path}/get?page={page}&limit={limit}&sort={quote(sort, safe='')}"
+        if not count:
+            path += "&count=false"
+        result = self._databucket._call("POST", path, rules.to_body()) or {}
+        # not counted (count=false): no 'total' and 'totalPages' in the response
+        counted = "total" in result
         return Page(
             rows=self._rows(result.get("data")),
             page=result.get("page", page),
             limit=result.get("limit", limit),
-            total=int(result.get("total", 0)),
-            total_pages=result.get("totalPages", 0),
+            total=int(result["total"]) if counted else -1,
+            total_pages=result.get("totalPages", 0) if counted else -1,
         )
 
     # ------------------------------------------------------------------ reserve

@@ -124,7 +124,7 @@ Dates can be given as `datetime`; they are sent as ISO text in UTC (a `datetime`
 | `insert(properties)`, `insert(NewData(p).tag_id(3).reserved(True))` | `POST /api/bucket/{bucket}` |
 | `insert_all([p1, p2, NewData(p3).tag_id(3)])` | `POST /api/bucket/{bucket}/multi` |
 | `get(id)` (`None` when missing), `get([id1, id2])` | `GET /api/bucket/{bucket}/{ids}` |
-| `find(rules).sort(Sort.desc("$.name")).limit(20).page(2).fetch()` / `.list()` / `.first()` / `.count()`, `count(rules)` | `POST /api/bucket/{bucket}/get` |
+| `find(rules).sort(Sort.desc("$.name")).limit(20).page(2).fetch()` / `.without_count()` / `.list()` / `.first()` / `.count()`, `count(rules)` | `POST /api/bucket/{bucket}/get` |
 | `reserve(rules).one()`, `.limit(3).sort(Sort.RANDOM).fetch()`, `.without_count()`, `.available()`, `.for_user("john")` (ADMIN) | `POST /api/bucket/{bucket}/reserve` |
 | `update(change, *ids)`, `update(rules, change)`, `release(*ids)` | `PUT /api/bucket/{bucket}[/{ids}]` |
 | `delete(*ids)`, `delete(rules)` | `DELETE /api/bucket/{bucket}[/{ids}]` |
