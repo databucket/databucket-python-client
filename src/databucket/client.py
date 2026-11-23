@@ -11,7 +11,7 @@ from typing import Any, TypeVar
 import requests
 
 from .bucket import Bucket
-from .model import DatabucketError, Project
+from .model import DatabucketError, Job, JobsRun, Project
 from .rules import _value
 
 #: The header selecting the version of the data API.
@@ -95,6 +95,36 @@ class Databucket:
     def bucket(self, name: str) -> Bucket[Any]:
         """A bucket. For typed properties: ``users: Bucket[User] = databucket.bucket("dev-users")``."""
         return Bucket(self, name)
+
+    def run_jobs(self, keyword: str, preview: bool = False) -> JobsRun:
+        """Runs all the jobs with the keyword (Settings → Jobs), e.g. "DEV cleaning", one after another by id, as this
+        user (ROBOT or higher, with access to the jobs' buckets). A failed job doesn't stop the others: check
+        ``errors``. ``preview=True`` changes nothing; the count of each job is then the rows it would run on.
+        Needs Databucket 3.23.0+. Raises :class:`DatabucketError` with status 404 when no job has the keyword (the
+        message lists the keywords), 409 when the jobs of the keyword are running."""
+        if not keyword or not keyword.strip():
+            raise ValueError("The keyword is empty")
+        path = "/api/task-schedules/run" + ("?preview=true" if preview else "")
+        result = self._call("POST", path, {"keyword": keyword})
+        jobs = [
+            Job(
+                id=job.get("id"),
+                name=job.get("name"),
+                task=job.get("task"),
+                bucket=job.get("bucket"),
+                status=job.get("status"),
+                count=job.get("count"),
+                message=job.get("message"),
+            )
+            for job in result.get("jobs") or []
+        ]
+        return JobsRun(
+            keyword=result.get("keyword"),
+            preview=bool(result.get("preview")),
+            ok=int(result.get("ok") or 0),
+            errors=int(result.get("errors") or 0),
+            jobs=jobs,
+        )
 
     def project(self) -> Project | None:
         """The project the client works in (signs in if not done yet); None when only a token was given."""

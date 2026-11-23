@@ -133,6 +133,16 @@ Dates can be given as `datetime`; they are sent as ISO text in UTC (a `datetime`
 
 `update`, `release`, `delete` and `clear_history` return the number of changed rows (or removed history entries).
 
+Jobs (on the client, not a bucket; Databucket 3.23.0+, ROBOT or higher):
+
+| Method | API |
+|---|---|
+| `databucket.run_jobs("DEV cleaning")`, `databucket.run_jobs("DEV cleaning", preview=True)` | `POST /api/task-schedules/run` |
+
+`run_jobs` runs all the [jobs](https://github.com/databucket/databucket-server/wiki/Jobs) with the keyword (Settings → Jobs),
+one after another, as the signed-in user - e.g. to clean the test data before the tests. A failed job doesn't stop the
+others: check `errors` and `jobs` of the result.
+
 `Change()` sets, removes or replaces properties, the tag and the reservation:
 `Change().set("$.status", "used").remove("$.tmp").tag_id(4)`, `Change().properties(new_user)`.
 

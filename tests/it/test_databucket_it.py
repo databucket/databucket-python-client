@@ -420,3 +420,12 @@ def test_search_history(items: Bucket[dict[str, Any]]) -> None:
 
     search = items.search_history(rows).where(Rule.property("$.status").eq("used"))
     assert fails(lambda: search.count()).status == 400
+
+
+def test_jobs_of_an_unknown_keyword() -> None:
+    # the jobs need a project set up by an admin; an unknown keyword checks the call (Databucket 3.23.0+)
+    error = fails(lambda: robot.run_jobs(f"client-it {RUN}", preview=True))
+    assert error.status == 404
+    assert "No job has the keyword" in str(error)
+    with pytest.raises(ValueError):
+        robot.run_jobs(" ")

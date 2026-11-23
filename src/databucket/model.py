@@ -49,6 +49,43 @@ class Reservation(Generic[T]):
 
 
 @dataclass(frozen=True)
+class Job:
+    """One job of a keyword and what its task did (:class:`JobsRun`)."""
+
+    id: int
+    name: str
+    #: The name of the task.
+    task: str
+    #: The name of the bucket.
+    bucket: str
+    #: ``OK`` or ``ERROR``.
+    status: str
+    #: The number of data rows; None when the job failed before counting.
+    count: int | None
+    #: What the task did, or why it failed.
+    message: str | None
+
+    @property
+    def ok(self) -> bool:
+        return self.status == "OK"
+
+
+@dataclass(frozen=True)
+class JobsRun:
+    """The result of :meth:`Databucket.run_jobs`: one entry per job, in the order they ran (by id)."""
+
+    #: The keyword as given.
+    keyword: str
+    #: True: nothing was changed, the counts are the rows each job would run on.
+    preview: bool
+    #: The jobs that ran without an error.
+    ok: int
+    #: The jobs that failed.
+    errors: int
+    jobs: list[Job]
+
+
+@dataclass(frozen=True)
 class HistoryEntry(Generic[T]):
     """One change of a data row."""
 
