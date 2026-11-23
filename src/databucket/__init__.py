@@ -5,11 +5,11 @@ from .bucket import Bucket
 from .change import Change, NewData
 from .client import API_VERSION_HEADER, Databucket
 from .fields import Field, HistoryField, Sort
-from .model import DatabucketError, DataRow, HistoryEntry, HistoryPage, Page, Project, Reservation
+from .model import DatabucketError, DataRow, HistoryEntry, HistoryPage, Job, JobsRun, Page, Project, Reservation
 from .rules import JsonLogic, Operand, Rule, Rules
 from .search import HistorySearch, Query, Reserve
 
-__version__ = "2.2.0"
+__version__ = "2.3.0"
 
 __all__ = [
     "API_VERSION_HEADER",
@@ -23,6 +23,8 @@ __all__ = [
     "HistoryField",
     "HistoryPage",
     "HistorySearch",
+    "Job",
+    "JobsRun",
     "JsonLogic",
     "NewData",
     "Operand",
