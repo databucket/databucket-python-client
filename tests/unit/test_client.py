@@ -134,7 +134,7 @@ def test_rows_are_mapped_and_dates_parsed() -> None:
 @responses.activate
 def test_a_missing_row_is_none_and_counts_come_from_the_message() -> None:
     responses.add(responses.GET, f"{URL}/api/bucket/b/9", json=[])
-    responses.add(responses.PUT, f"{URL}/api/bucket/b/1,2", json={"message": "Modified 2 data row(s)"})
+    responses.add(responses.PATCH, f"{URL}/api/bucket/b/1,2", json={"message": "Modified 2 data row(s)"})
     bucket = Databucket(URL, token="t").bucket("b")
     assert bucket.get(9) is None
     assert bucket.release(1, 2) == 2
@@ -143,7 +143,7 @@ def test_a_missing_row_is_none_and_counts_come_from_the_message() -> None:
 
 @responses.activate
 def test_a_datetime_in_a_change_is_sent_as_iso_text() -> None:
-    responses.add(responses.PUT, f"{URL}/api/bucket/b/1", json={"message": "Modified 1 data row(s)"})
+    responses.add(responses.PATCH, f"{URL}/api/bucket/b/1", json={"message": "Modified 1 data row(s)"})
     when = datetime(2026, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
     Databucket(URL, token="t").bucket("b").update(Change().set("$.paidAt", when), 1)
     sent = json.loads(responses.calls[0].request.body or "{}")

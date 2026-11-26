@@ -76,6 +76,8 @@ class Databucket:
         self._current_token = token
         self._current_project: Project | None = None
         self._lock = threading.Lock()
+        # data rows are changed with PATCH (Databucket 3.26.0+); an older server answers 405, then PUT, from then on
+        self._change_with_put = False
 
         self._sign_in_fn: Callable[[int | None], Any] | None = None
         if username is not None or password is not None:
@@ -205,6 +207,17 @@ class Databucket:
                     self._current_token = None
             return self._call(method, path, body, retry=False)
         return self._handle(method, path, status, text)
+
+    def _change(self, path: str, body: Any) -> Any:
+        """Changes data rows: PATCH, or PUT for a server before 3.26.0."""
+        if not self._change_with_put:
+            try:
+                return self._call("PATCH", path, body)
+            except DatabucketError as e:
+                if e.status != 405:
+                    raise
+                self._change_with_put = True
+        return self._call("PUT", path, body)
 
     def _send(self, method: str, path: str, headers: dict[str, str], data: str | None) -> tuple[int, str]:
         url = self._base_url + path
