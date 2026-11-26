@@ -126,7 +126,7 @@ Dates can be given as `datetime`; they are sent as ISO text in UTC (a `datetime`
 | `get(id)` (`None` when missing), `get([id1, id2])` | `GET /api/bucket/{bucket}/{ids}` |
 | `find(rules).sort(Sort.desc("$.name")).limit(20).page(2).fetch()` / `.without_count()` / `.list()` / `.first()` / `.count()`, `count(rules)` | `POST /api/bucket/{bucket}/get` |
 | `reserve(rules).one()`, `.limit(3).sort(Sort.RANDOM).fetch()`, `.without_count()`, `.available()`, `.for_user("john")` (ADMIN) | `POST /api/bucket/{bucket}/reserve` |
-| `update(change, *ids)`, `update(rules, change)`, `release(*ids)` | `PUT /api/bucket/{bucket}[/{ids}]` |
+| `update(change, *ids)`, `update(rules, change)`, `release(*ids)` | `PATCH /api/bucket/{bucket}[/{ids}]` (`PUT` with a server before 3.26.0) |
 | `delete(*ids)`, `delete(rules)` | `DELETE /api/bucket/{bucket}[/{ids}]` |
 | `history(id)`, `history_properties(id, *history_ids)`, `clear_history(id)`, `clear_history(rules)` | `/api/bucket/{bucket}/{id}/history...` |
 | `search_history(rows).where(...).sort(...).limit(50).with_properties().fetch()` / `.list()` / `.count()` | `POST /api/bucket/{bucket}/history/get` |

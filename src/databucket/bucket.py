@@ -123,10 +123,10 @@ class Bucket(Generic[T]):
             if len(rest) != 1 or not isinstance(rest[0], Change):
                 raise TypeError("update(rules, change): the change is missing")
             body = {**rest[0].to_body(), **first.to_body()}
-            return _count(self._databucket._call("PUT", self._path, body))
+            return _count(self._databucket._change(self._path, body))
         if not rest:
             return 0
-        return _count(self._databucket._call("PUT", f"{self._path}/{_ids(rest)}", first.to_body()))
+        return _count(self._databucket._change(f"{self._path}/{_ids(rest)}", first.to_body()))
 
     @overload
     def delete(self, *ids: int) -> int: ...

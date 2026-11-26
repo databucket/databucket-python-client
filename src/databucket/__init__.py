@@ -9,7 +9,7 @@ from .model import DatabucketError, DataRow, HistoryEntry, HistoryPage, Job, Job
 from .rules import JsonLogic, Operand, Rule, Rules
 from .search import HistorySearch, Query, Reserve
 
-__version__ = "2.3.0"
+__version__ = "2.4.0"
 
 __all__ = [
     "API_VERSION_HEADER",
